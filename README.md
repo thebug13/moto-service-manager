@@ -36,8 +36,9 @@ cp .env-example .env
 4. Actualizar el archivo `.env` con tu configuración:
 - Establecer el PUERTO deseado (predeterminado: 3001)
 - Configurar los ajustes SMTP para la funcionalidad de correo electrónico
+  Puedes crearte una cuenta gratuita en: [Mailtrap](https://mailtrap.io/email-sending/)
 - Configurar los ajustes de la base de datos
-
+  Puedes crear la base de datos Mysql en Xammp o Laragon totalmente gratis
 ## Estructura del Proyecto
 
 ```
@@ -94,4 +95,5 @@ Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE par
 
 ## Autor
 
-Felipe Loaiza
+Felipe Loaiza Castaño
+- GitHub: [@thebug13](https://github.com/thebug13)
