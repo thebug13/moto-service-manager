@@ -89,8 +89,8 @@ El Backend se inicia en la siguiente direccion: http://localhost:3001
 
 - Para iniciar el **frontend** (en una terminal separada):
 
-cd frontend
-ng serve
+- cd frontend
+- ng serve
 
 El Frontend se inicia en la siguiente direccion: http://localhost:4200
 
