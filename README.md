@@ -81,17 +81,16 @@ crud-node/
 ## Scripts Disponibles
 
 - Para iniciar el **backend**:
-  ```bash
+
 npm run dev
-  ```
+
 
 El Backend se inicia en la siguiente direccion: http://localhost:3001
 
 - Para iniciar el **frontend** (en una terminal separada):
-  ```bash
+
 cd frontend
 ng serve
-  ```
 
 El Frontend se inicia en la siguiente direccion: http://localhost:4200
 
