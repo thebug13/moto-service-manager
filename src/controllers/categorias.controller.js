@@ -1,104 +1,106 @@
 const model = require("../models/Category");
 
-const create = (req, res) => {
-  res.render("categorias/create");
+// No necesitamos el método create si solo respondemos con JSON
+// const create = (req, res) => {
+//   res.render("categorias/create");
+// };
+
+const store = async (req, res) => {
+  const { nombre } = req.body;
+
+  if (!nombre) {
+    return res.status(400).json({ error: 'El nombre es requerido' });
+  }
+
+  try {
+    const id = await model.create(nombre); // Usar await
+    res.status(201).json({ id, nombre });
+  } catch (error) {
+    console.error('Error al crear categoría:', error);
+    return res.status(500).json({ error: 'Error al crear categoría' });
+  }
 };
 
-const store = (req, res) => {
-  const { name } = req.body;
-
-  model.create(name, (error, id) => {
-    if (error) {
-      // console.error(error);
-
-      return res.status(500).send("Internal Server Error");
-    }
-
-    console.log(id);
-
-    res.redirect("/categorias");
-  });
+const index = async (req, res) => {
+  try {
+    const categorias = await model.findAll(); // Usar await
+    res.json(categorias);
+  } catch (error) {
+    console.error('Error al obtener categorías:', error);
+    return res.status(500).json({ error: 'Error al obtener categorías' });
+  }
 };
 
-const index = (req, res) => {
-  model.findAll((error, categorias) => {
-    if (error) {
-      return res.status(500).send("Internal Server Error");
-    }
-
-    res.render("categorias/index", { categorias });
-  });
-};
-
-const show = (req, res) => {
+const show = async (req, res) => {
   const { id } = req.params;
 
-  model.findById(id, (error, categoria) => {
-    if (error) {
-      return res.status(500).send("Internal Server Error");
-    }
-
-    // console.log(categoria);
-
+  try {
+    const categoria = await model.findById(id); // Usar await
     if (!categoria) {
-      return res.status(404).send("No existe la categoría");
+      return res.status(404).json({ error: 'Categoría no encontrada' });
     }
-
-    res.render("categorias/show", { categoria });
-  });
+    res.json(categoria);
+  } catch (error) {
+    console.error('Error al obtener categoría:', error);
+    return res.status(500).json({ error: 'Error al obtener categoría' });
+  }
 };
 
-const edit = (req, res) => {
+// No necesitamos el método edit si solo respondemos con JSON
+// const edit = (req, res) => {
+//   const { id } = req.params;
+//   model.findById(id, (error, categoria) => {
+//     if (error) {
+//       return res.status(500).send("Internal Server Error");
+//     }
+//     if (!categoria) {
+//       return res.status(404).send("No existe la categoría");
+//     }
+//     res.render("categorias/edit", { categoria });
+//   });
+// };
+
+const update = async (req, res) => {
   const { id } = req.params;
+  const { nombre } = req.body;
 
-  model.findById(id, (error, categoria) => {
-    if (error) {
-      return res.status(500).send("Internal Server Error");
+  if (!nombre) {
+    return res.status(400).json({ error: 'El nombre es requerido' });
+  }
+
+  try {
+    const changes = await model.update(id, nombre); // Usar await
+    if (changes === 0) {
+      return res.status(404).json({ error: 'Categoría no encontrada' });
     }
-
-    if (!categoria) {
-      return res.status(404).send("No existe la categoría");
-    }
-
-    res.render("categorias/edit", { categoria });
-  });
+    res.json({ id, nombre });
+  } catch (error) {
+    console.error('Error al actualizar categoría:', error);
+    return res.status(500).json({ error: 'Error al actualizar categoría' });
+  }
 };
 
-const update = (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-
-  model.update(id, name, (error, changes) => {
-    if (error) {
-      return res.status(500).send("Internal Server Error");
-    }
-
-    // console.log(changes);
-
-    res.redirect("/categorias");
-  });
-};
-
-const destroy = (req, res) => {
+const destroy = async (req, res) => {
   const { id } = req.params;
 
-  model.destroy(id, (error, changes) => {
-    if (error) {
-      return res.status(500).send("Internal Server Error");
+  try {
+    const changes = await model.destroy(id); // Usar await
+     if (changes === 0) {
+      return res.status(404).json({ error: 'Categoría no encontrada' });
     }
-
-    // console.log(changes);
-
-    res.redirect("/categorias");
-  });
+    res.json({ message: 'Categoría eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar categoría:', error);
+    return res.status(500).json({ error: 'Error al eliminar categoría' });
+  }
 };
 
 module.exports = {
-  create,
+  // create,
   store,
   index,
   show,
-  edit,
+  // edit,
   update,
   destroy,
 };

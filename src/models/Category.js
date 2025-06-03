@@ -1,64 +1,53 @@
+const db = require('./mysql'); // Ahora es un pool de promesas
 
-const db = require("./sqlite");
-
-const create = (name, callback) => {
-  const sql = `INSERT INTO categories (name) VALUES (?)`;
-
-  db.run(sql, [name], function (error) {
-    if (error) {
-      return callback(error);
-    }
-
-    callback(null, this.lastID);
-  });
+const create = async (nombre) => {
+  const sql = `INSERT INTO categorias (nombre) VALUES (?)`;
+  try {
+    const [results] = await db.query(sql, [nombre]);
+    return results.insertId;
+  } catch (error) {
+    throw error;
+  }
 };
 
-const findAll = (callback) => {
-  const sql = `SELECT * FROM categories`;
-
-  db.all(sql, (error, rows) => {
-    if (error) {
-      return callback(error);
-    }
-
-    callback(null, rows);
-  });
+const findAll = async () => {
+  const sql = `SELECT * FROM categorias`;
+  try {
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
 };
 
-const findById = (id, callback) => {
-  const sql = `SELECT * FROM categories WHERE id = ?`;
-
-  db.get(sql, [id], (error, row) => {
-    if (error) {
-      return callback(error);
-    }
-
-    callback(null, row);
-  });
+const findById = async (id) => {
+  const sql = `SELECT * FROM categorias WHERE id = ?`;
+  try {
+    const [rows] = await db.query(sql, [id]);
+    return rows[0];
+  } catch (error) {
+    throw error;
+  }
 };
 
-const update = (id, name, callback) => {
-  const sql = `UPDATE categories SET name = ? WHERE id = ?`;
-
-  db.run(sql, [name, id], function (error) {
-    if (error) {
-      return callback(error);
-    }
-
-    callback(null, this.changes);
-  });
+const update = async (id, nombre) => {
+  const sql = `UPDATE categorias SET nombre = ? WHERE id = ?`;
+  try {
+    const [results] = await db.query(sql, [nombre, id]);
+    return results.affectedRows;
+  } catch (error) {
+    throw error;
+  }
 };
 
-const destroy = (id, callback) => {
-  const sql = `DELETE FROM categories WHERE id = ?`;
-
-  db.run(sql, [id], function (error) {
-    if (error) {
-      return callback(error);
-    }
-
-    callback(null, this.changes);
-  });
+const destroy = async (id) => {
+  const sql = `DELETE FROM categorias WHERE id = ?`;
+  try {
+    const [results] = await db.query(sql, [id]);
+    return results.affectedRows;
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {
