@@ -11,26 +11,26 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
-        <a class="navbar-brand" routerLink="/productos">Crud Node</a>
+        <a class="navbar-brand fugaz-one-regular" routerLink="/productos">Crud Node</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" routerLink="/productos" routerLinkActive="active">Productos</a>
+              <a class="nav-link fugaz-one-regular" routerLink="/productos" routerLinkActive="active">Productos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" routerLink="/categorias" routerLinkActive="active">Categorías</a>
+              <a class="nav-link fugaz-one-regular" routerLink="/categorias" routerLinkActive="active">Categorías</a>
             </li>
             <li class="nav-item" *ngIf="isAdmin">
-              <a class="nav-link" routerLink="/user-management" routerLinkActive="active">Gestión de Usuarios</a>
+              <a class="nav-link fugaz-one-regular" routerLink="/user-management" routerLinkActive="active">Gestión de Usuarios</a>
             </li>
           </ul>
-          <span class="navbar-text me-3 text-light">
+          <span class="navbar-text me-3 text-light fugaz-one-regular">
             Rol: {{ userRole }}
           </span>
-          <button class="btn btn-danger" (click)="logout()">
+          <button class="btn btn-danger fugaz-one-regular" (click)="logout()">
             <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
           </button>
         </div>

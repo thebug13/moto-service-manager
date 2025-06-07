@@ -23,6 +23,8 @@ export class UserManagementComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
   successMessage: string | null = null;
+  searchText: string = '';
+  filteredUsers: User[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -47,6 +49,7 @@ export class UserManagementComponent implements OnInit {
     this.apiService.getUsers().subscribe({
       next: (data) => {
         this.users = data;
+        this.filteredUsers = [...this.users]; // Initialize filtered users
         this.isLoading = false;
       },
       error: (error) => {
@@ -88,5 +91,18 @@ export class UserManagementComponent implements OnInit {
         }
       }
     });
+  }
+
+  filterUsers(): void {
+    if (!this.searchText) {
+      this.filteredUsers = [...this.users];
+      return;
+    }
+
+    const lowerCaseSearchText = this.searchText.toLowerCase();
+    this.filteredUsers = this.users.filter(user => 
+      user.email.toLowerCase().includes(lowerCaseSearchText) ||
+      user.role.toLowerCase().includes(lowerCaseSearchText)
+    );
   }
 } 

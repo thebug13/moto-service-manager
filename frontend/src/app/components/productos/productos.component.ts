@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-productos',
@@ -12,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './productos.component.html',
   styleUrls: ['./productos.component.css']
 })
-export class ProductosComponent implements OnInit {
+export class ProductosComponent implements OnInit, OnDestroy {
   productos: any[] = [];
   categorias: any[] = [];
   producto: any = { nombre: '', precio: 0, categoria_id: null };
@@ -22,6 +23,9 @@ export class ProductosComponent implements OnInit {
   errorMessage: string | null = null;
   successMessage: string | null = null;
   isAdmin: boolean = false;
+  searchText: string = '';
+  filteredProductos: any[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
@@ -50,6 +54,7 @@ export class ProductosComponent implements OnInit {
     this.apiService.getProductos().subscribe({
       next: (data) => {
         this.productos = data;
+        this.filteredProductos = [...this.productos];
         this.isLoading = false;
       },
       error: (error: any) => {
@@ -159,5 +164,23 @@ export class ProductosComponent implements OnInit {
   obtenerNombreCategoria(categoriaId: number): string {
     const categoria = this.categorias.find(c => c.id === categoriaId);
     return categoria ? categoria.nombre : '';
+  }
+
+  filterProducts(): void {
+    if (!this.searchText) {
+      this.filteredProductos = [...this.productos];
+      return;
+    }
+
+    const lowerCaseSearchText = this.searchText.toLowerCase();
+    this.filteredProductos = this.productos.filter(producto => 
+      producto.nombre.toLowerCase().includes(lowerCaseSearchText) ||
+      (producto.categoria_nombre && producto.categoria_nombre.toLowerCase().includes(lowerCaseSearchText))
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 } 

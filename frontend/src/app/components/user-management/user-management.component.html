@@ -1,11 +1,16 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-12">
-      <div class="card bg-dark text-white">
+      <div class="card">
         <div class="card-header">
-          <h2 class="permanent-marker-regular mb-0">Gestión de Usuarios</h2>
+          <h2 class="fugaz-one-regular mb-0">Gestión de Usuarios</h2>
         </div>
         <div class="card-body">
+          <!-- Campo de búsqueda -->
+          <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Buscar usuario por email o rol..." [(ngModel)]="searchText" (input)="filterUsers()">
+          </div>
+
           <!-- Mensajes de error y éxito -->
           <div *ngIf="error" class="alert alert-danger">
             {{ error }}
@@ -22,8 +27,8 @@
           </div>
 
           <!-- Tabla de usuarios -->
-          <div *ngIf="!isLoading" class="table-responsive">
-            <table class="table table-dark table-hover">
+          <div *ngIf="!isLoading && filteredUsers.length > 0" class="table-responsive">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -32,12 +37,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let user of users">
+                <tr *ngFor="let user of filteredUsers">
                   <td>{{ user.id }}</td>
                   <td>{{ user.email }}</td>
                   <td>
                     <select 
-                      class="form-select bg-dark text-white" 
+                      class="form-select text-dark" 
                       [value]="user.role"
                       (change)="updateUserRole(user.id, $event)"
                       [disabled]="isLoading">
@@ -48,6 +53,10 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngIf="!isLoading && filteredUsers.length === 0 && !error" class="alert alert-info mt-3" role="alert">
+            No hay usuarios registrados en el sistema o no se encontraron resultados para su búsqueda.
           </div>
         </div>
       </div>

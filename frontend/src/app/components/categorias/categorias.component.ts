@@ -1,9 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+
+interface Categoria {
+  id: number;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-categorias',
@@ -12,15 +18,18 @@ import { Router } from '@angular/router';
   templateUrl: './categorias.component.html',
   styleUrls: ['./categorias.component.css']
 })
-export class CategoriasComponent implements OnInit {
-  categorias: any[] = [];
-  categoria: any = { nombre: '' };
+export class CategoriasComponent implements OnInit, OnDestroy {
+  categorias: Categoria[] = [];
+  categoria: Categoria = { id: 0, nombre: '' };
   isEditMode = false;
   selectedCategoryId: number | null = null;
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
   isAdmin: boolean = false;
+  searchText: string = '';
+  filteredCategorias: Categoria[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
@@ -43,6 +52,7 @@ export class CategoriasComponent implements OnInit {
     this.apiService.getCategorias().subscribe({
       next: (data) => {
         this.categorias = data;
+        this.filteredCategorias = [...this.categorias];
         this.isLoading = false;
       },
       error: (error: any) => {
@@ -57,10 +67,10 @@ export class CategoriasComponent implements OnInit {
     });
   }
 
-  onEdit(categoria: any): void {
+  onEdit(categoria: Categoria): void {
     this.isEditMode = true;
     this.selectedCategoryId = categoria.id;
-    this.categoria = { ...categoria }; // Copia profunda para evitar mutaciones directas
+    this.categoria = { ...categoria };
     this.errorMessage = null;
     this.successMessage = null;
   }
@@ -133,8 +143,25 @@ export class CategoriasComponent implements OnInit {
   resetForm(): void {
     this.isEditMode = false;
     this.selectedCategoryId = null;
-    this.categoria = { nombre: '' };
+    this.categoria = { id: 0, nombre: '' };
     this.isLoading = false;
     // Los mensajes de éxito/error se limpian al enviar o cargar.
+  }
+
+  filterCategories(): void {
+    if (!this.searchText) {
+      this.filteredCategorias = [...this.categorias];
+      return;
+    }
+
+    const lowerCaseSearchText = this.searchText.toLowerCase();
+    this.filteredCategorias = this.categorias.filter(categoria =>
+      categoria.nombre.toLowerCase().includes(lowerCaseSearchText)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 } 
