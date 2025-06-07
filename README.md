@@ -57,11 +57,15 @@ MYSQL_DATABASE=crud_node
 JWT_SECRET=tu_secreto_jwt_seguro
 ```
 
-5. Crear la base de datos y las tablas en tu servidor MySQL. Ejecuta el script de inicialización del backend:
-```bash
-node src/models/init-db.js
-```
+## Inicializacion de la Base de datos
+
+5. La base de datos esta en la carpeta /db importa el archibo en PhpMyAdmin
+
+
 Este script creará la base de datos `crud_node` (si no existe) y las tablas `users`, `categorias` y `productos`, incluyendo un usuario `Administrador` por defecto.
+
+User: admin@gmail.com
+Password: admin123
 
 ## Estructura del Proyecto
 
