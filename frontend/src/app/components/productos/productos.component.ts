@@ -1,165 +1,159 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-productos',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="container">
-      <h2>Gestión de Productos</h2>
-      
-      <!-- Formulario de producto -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title">{{ producto.id ? 'Editar Producto' : 'Nuevo Producto' }}</h5>
-          <form (ngSubmit)="guardarProducto()">
-            <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="nombre" [(ngModel)]="producto.nombre" name="nombre" required>
-            </div>
-            <div class="mb-3">
-              <label for="precio" class="form-label">Precio</label>
-              <input type="number" class="form-control" id="precio" [(ngModel)]="producto.precio" name="precio" required>
-            </div>
-            <div class="mb-3">
-              <label for="categoria" class="form-label">Categoría</label>
-              <select class="form-select" id="categoria" [(ngModel)]="producto.categoria_id" name="categoria_id" required>
-                <option value="">Seleccione una categoría</option>
-                <option *ngFor="let categoria of categorias" [value]="categoria.id">
-                  {{ categoria.nombre }}
-                </option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              {{ producto.id ? 'Actualizar' : 'Crear' }}
-            </button>
-            <button type="button" class="btn btn-secondary ms-2" (click)="limpiarFormulario()">
-              Cancelar
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Lista de productos -->
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Precio</th>
-              <th>Categoría</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let p of productos">
-              <td>{{ p.id }}</td>
-              <td>{{ p.nombre }}</td>
-              <td>{{ p.precio | currency }}</td>
-              <td>{{ obtenerNombreCategoria(p.categoria_id) }}</td>
-              <td>
-                <button class="btn btn-sm btn-warning me-2" (click)="editarProducto(p)">Editar</button>
-                <button class="btn btn-sm btn-danger" (click)="eliminarProducto(p.id)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `,
-  styles: []
+  templateUrl: './productos.component.html',
+  styleUrls: ['./productos.component.css']
 })
 export class ProductosComponent implements OnInit {
   productos: any[] = [];
   categorias: any[] = [];
-  producto: any = {
-    id: null,
-    nombre: '',
-    precio: 0,
-    categoria_id: ''
-  };
+  producto: any = { nombre: '', precio: 0, categoria_id: null };
+  isEditMode = false;
+  selectedProductId: number | null = null;
+  isLoading = false;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+  isAdmin: boolean = false;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
-  ngOnInit() {
-    this.cargarProductos();
-    this.cargarCategorias();
+  ngOnInit(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.isAdmin = this.authService.getUserRole() === 'Administrador';
+    this.loadProductos();
+    this.loadCategorias();
   }
 
-  cargarProductos() {
+  cerrarSesion() {
+    this.authService.removeToken();
+    this.router.navigate(['/login']);
+  }
+
+  loadProductos(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
     this.apiService.getProductos().subscribe({
       next: (data) => {
         this.productos = data;
+        this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al cargar productos:', error);
+        this.errorMessage = 'Error al cargar productos.';
+        this.isLoading = false;
+        if (error.status === 401) {
+          this.authService.removeToken();
+          this.router.navigate(['/login']);
+        }
       }
     });
   }
 
-  cargarCategorias() {
+  loadCategorias(): void {
     this.apiService.getCategorias().subscribe({
       next: (data) => {
         this.categorias = data;
       },
-      error: (error) => {
-        console.error('Error al cargar categorías:', error);
+      error: (error: any) => {
+        console.error('Error al cargar categorías para el select:', error);
+        // No es crítico si fallan las categorías, el componente puede seguir funcionando sin ellas.
       }
     });
   }
 
-  guardarProducto() {
-    if (this.producto.id) {
-      this.apiService.actualizarProducto(this.producto.id, this.producto).subscribe({
+  onEdit(producto: any): void {
+    this.isEditMode = true;
+    this.selectedProductId = producto.id;
+    this.producto = { ...producto };
+    this.errorMessage = null;
+    this.successMessage = null;
+  }
+
+  onSubmit(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    if (this.isEditMode) {
+      this.apiService.updateProducto(this.producto.id, this.producto).subscribe({
         next: () => {
-          this.cargarProductos();
-          this.limpiarFormulario();
+          this.successMessage = 'Producto actualizado correctamente';
+          this.resetForm();
+          this.loadProductos();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al actualizar producto:', error);
+          this.errorMessage = 'Error al actualizar producto.';
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.authService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     } else {
-      this.apiService.crearProducto(this.producto).subscribe({
+      this.apiService.createProducto(this.producto).subscribe({
         next: () => {
-          this.cargarProductos();
-          this.limpiarFormulario();
+          this.successMessage = 'Producto creado correctamente';
+          this.resetForm();
+          this.loadProductos();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al crear producto:', error);
+          this.errorMessage = 'Error al crear producto.';
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.authService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     }
   }
 
-  editarProducto(producto: any) {
-    this.producto = { ...producto };
-  }
-
-  eliminarProducto(id: number) {
-    if (confirm('¿Está seguro de eliminar este producto?')) {
-      this.apiService.eliminarProducto(id).subscribe({
+  onDelete(id: number): void {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      this.isLoading = true;
+      this.errorMessage = null;
+      this.successMessage = null;
+      this.apiService.deleteProducto(id).subscribe({
         next: () => {
-          this.cargarProductos();
+          this.successMessage = 'Producto eliminado correctamente';
+          this.loadProductos();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al eliminar producto:', error);
+          this.errorMessage = 'Error al eliminar producto.';
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.authService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     }
   }
 
-  limpiarFormulario() {
-    this.producto = {
-      id: null,
-      nombre: '',
-      precio: 0,
-      categoria_id: ''
-    };
+  resetForm(): void {
+    this.isEditMode = false;
+    this.selectedProductId = null;
+    this.producto = { nombre: '', precio: 0, categoria_id: null };
+    this.isLoading = false;
   }
 
   obtenerNombreCategoria(categoriaId: number): string {

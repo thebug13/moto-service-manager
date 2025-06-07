@@ -1,0 +1,18 @@
+/* Estilos para layout.component.css */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.container-fluid {
+  flex-grow: 1;
+}
+
+.footer {
+  flex-shrink: 0;
+} 

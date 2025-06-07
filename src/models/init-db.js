@@ -39,6 +39,17 @@ const initDatabase = async () => {
     `);
     console.log('Tabla productos creada o ya existente');
 
+    // Crear tabla de usuarios
+    await connection.promise().query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(50) NOT NULL DEFAULT 'Vendedor'
+      )
+    `);
+    console.log('Tabla users creada o ya existente');
+
   } catch (err) {
     console.error('Error durante la inicialización:', err);
   } finally {

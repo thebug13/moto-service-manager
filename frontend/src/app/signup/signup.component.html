@@ -1,0 +1,51 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card bg-dark text-white">
+        <div class="card-body">
+          <h2 class="text-center mb-4">Registro</h2>
+          
+          <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+            <!-- Campo de Email -->
+            <div class="form-group mb-3">
+              <label for="email" class="form-label text-white">Correo Electrónico</label>
+              <input type="email" id="email" class="form-control" formControlName="email" required>
+              <div *ngIf="signupForm.get('email')?.invalid && (signupForm.get('email')?.dirty || signupForm.get('email')?.touched)" class="text-danger mt-1">
+                <div *ngIf="signupForm.get('email')?.errors?.['required']">El correo electrónico es requerido.</div>
+                <div *ngIf="signupForm.get('email')?.errors?.['email']">Ingresa un correo electrónico válido.</div>
+              </div>
+            </div>
+
+            <!-- Campo de Contraseña -->
+            <div class="form-group mb-3">
+              <label for="password" class="form-label text-white">Contraseña</label>
+              <input type="password" id="password" class="form-control" formControlName="password" required>
+              <div *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.dirty || signupForm.get('password')?.touched)" class="text-danger mt-1">
+                <div *ngIf="signupForm.get('password')?.errors?.['required']">La contraseña es requerida.</div>
+                <div *ngIf="signupForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres.</div>
+              </div>
+            </div>
+            
+            <!-- Botón de Registro -->
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="signupForm.invalid || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Registrarse
+              </button>
+            </div>
+            
+            <!-- Mensaje de éxito/error -->
+            <div *ngIf="message" class="alert mt-3" [ngClass]="{'alert-success': isSuccess, 'alert-danger': !isSuccess}">
+              {{ message }}
+            </div>
+            
+            <!-- Enlace a la página de login -->
+            <p class="text-center text-white mt-3">¿Ya tienes cuenta? <a routerLink="/login" class="text-warning">Inicia Sesión aquí</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer> 

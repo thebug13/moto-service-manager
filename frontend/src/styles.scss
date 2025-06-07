@@ -1,1 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Asegura que html y body ocupen toda la altura disponible */
+    min-height: 100vh; /* Asegura que ocupen al menos la altura del viewport */
+    display: flex; /* Añadir display flex al body */
+    flex-direction: column; /* Apilar elementos en columna */
+}
+
+app-root {
+    flex-grow: 1; /* Permite que app-root crezca y ocupe el espacio disponible */
+    display: flex; /* Asegura que app-root sea también un contenedor flex */
+    flex-direction: column; /* Apila los elementos dentro de app-root */
+}
+
+.permanent-marker-regular {
+  font-family: "Permanent Marker", cursive;
+  font-weight: 400;
+  font-style: normal;
+}

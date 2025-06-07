@@ -1,0 +1,67 @@
+<div class="container">
+  <h2 class="permanent-marker-regular">Gestión de Categorías</h2>
+
+  <!-- Formulario de categoría -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">{{ categoria.id ? 'Editar Categoría' : 'Nueva Categoría' }}</h5>
+      <form (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" [(ngModel)]="categoria.nombre" name="nombre" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          {{ categoria.id ? 'Actualizar' : 'Crear' }}
+        </button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="resetForm()">
+          Cancelar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mensajes de error y éxito -->
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success" role="alert">
+    {{ successMessage }}
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading" class="text-center mt-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando categorías...</span>
+    </div>
+    <p>Cargando categorías...</p>
+  </div>
+
+  <!-- Lista de categorías -->
+  <div *ngIf="!isLoading && categorias.length > 0">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mt-3">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of categorias">
+            <td>{{ c.id }}</td>
+            <td>{{ c.nombre }}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-2" (click)="onEdit(c)">Editar</button>
+              <button *ngIf="isAdmin" class="btn btn-sm btn-danger" (click)="onDelete(c.id)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && categorias.length === 0 && !errorMessage" class="alert alert-info mt-3" role="alert">
+    No hay categorías registradas en el sistema.
+  </div>
+</div> 

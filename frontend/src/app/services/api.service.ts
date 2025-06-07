@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,52 +9,68 @@ import { Observable } from 'rxjs';
 export class ApiService {
   private apiUrl = 'http://localhost:3001/api';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
-  // Productos
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  // Métodos para la gestión de usuarios
+  getUsers(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users`, { headers: this.getHeaders() });
+  }
+
+  updateUserRole(id: number, newRole: string): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/users/${id}/role`, 
+      { role: newRole }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Métodos para productos
   getProductos(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/productos`);
+    return this.http.get(`${this.apiUrl}/productos`, { headers: this.getHeaders() });
   }
 
-  getProducto(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/productos/${id}`);
+  createProducto(producto: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/productos`, producto, { headers: this.getHeaders() });
   }
 
-  crearProducto(producto: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/productos`, producto);
+  updateProducto(id: number, producto: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/productos/${id}`, producto, { headers: this.getHeaders() });
   }
 
-  actualizarProducto(id: number, producto: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/productos/${id}`, producto);
+  deleteProducto(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/productos/${id}`, { headers: this.getHeaders() });
   }
 
-  eliminarProducto(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/productos/${id}`);
-  }
-
-  // Categorías
+  // Métodos para categorías
   getCategorias(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/categorias`);
+    return this.http.get(`${this.apiUrl}/categorias`, { headers: this.getHeaders() });
   }
 
-  getCategoria(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/categorias/${id}`);
+  createCategoria(categoria: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/categorias`, categoria, { headers: this.getHeaders() });
   }
 
-  crearCategoria(categoria: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/categorias`, categoria);
+  updateCategoria(id: number, categoria: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/categorias/${id}`, categoria, { headers: this.getHeaders() });
   }
 
-  actualizarCategoria(id: number, categoria: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/categorias/${id}`, categoria);
-  }
-
-  eliminarCategoria(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/categorias/${id}`);
+  deleteCategoria(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/categorias/${id}`, { headers: this.getHeaders() });
   }
 
   // Contacto
   enviarMensaje(mensaje: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/contacto`, mensaje);
+    return this.http.post(`${this.apiUrl}/contacto`, mensaje, { headers: this.getHeaders() });
   }
 } 

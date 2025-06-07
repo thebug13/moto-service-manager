@@ -2,129 +2,139 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-categorias',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="container">
-      <h2>Gestión de Categorías</h2>
-      
-      <!-- Formulario de categoría -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title">{{ categoria.id ? 'Editar Categoría' : 'Nueva Categoría' }}</h5>
-          <form (ngSubmit)="guardarCategoria()">
-            <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="nombre" [(ngModel)]="categoria.nombre" name="nombre" required>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              {{ categoria.id ? 'Actualizar' : 'Crear' }}
-            </button>
-            <button type="button" class="btn btn-secondary ms-2" (click)="limpiarFormulario()">
-              Cancelar
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Lista de categorías -->
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let c of categorias">
-              <td>{{ c.id }}</td>
-              <td>{{ c.nombre }}</td>
-              <td>
-                <button class="btn btn-sm btn-warning me-2" (click)="editarCategoria(c)">Editar</button>
-                <button class="btn btn-sm btn-danger" (click)="eliminarCategoria(c.id)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `,
-  styles: []
+  templateUrl: './categorias.component.html',
+  styleUrls: ['./categorias.component.css']
 })
 export class CategoriasComponent implements OnInit {
   categorias: any[] = [];
-  categoria: any = {
-    id: null,
-    nombre: ''
-  };
+  categoria: any = { nombre: '' };
+  isEditMode = false;
+  selectedCategoryId: number | null = null;
+  isLoading = false;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+  isAdmin: boolean = false;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
-  ngOnInit() {
-    this.cargarCategorias();
+  ngOnInit(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.isAdmin = this.authService.getUserRole() === 'Administrador';
+    this.loadCategorias();
   }
 
-  cargarCategorias() {
+  loadCategorias(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
     this.apiService.getCategorias().subscribe({
       next: (data) => {
         this.categorias = data;
+        this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al cargar categorías:', error);
+        this.errorMessage = 'Error al cargar categorías.';
+        this.isLoading = false;
+        if (error.status === 401) {
+          this.authService.removeToken();
+          this.router.navigate(['/login']);
+        }
       }
     });
   }
 
-  guardarCategoria() {
-    if (this.categoria.id) {
-      this.apiService.actualizarCategoria(this.categoria.id, this.categoria).subscribe({
+  onEdit(categoria: any): void {
+    this.isEditMode = true;
+    this.selectedCategoryId = categoria.id;
+    this.categoria = { ...categoria }; // Copia profunda para evitar mutaciones directas
+    this.errorMessage = null;
+    this.successMessage = null;
+  }
+
+  onSubmit(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    if (this.isEditMode) {
+      this.apiService.updateCategoria(this.categoria.id, this.categoria).subscribe({
         next: () => {
-          this.cargarCategorias();
-          this.limpiarFormulario();
+          this.successMessage = 'Categoría actualizada correctamente';
+          this.resetForm();
+          this.loadCategorias();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al actualizar categoría:', error);
+          this.errorMessage = 'Error al actualizar categoría.';
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.authService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     } else {
-      this.apiService.crearCategoria(this.categoria).subscribe({
+      this.apiService.createCategoria(this.categoria).subscribe({
         next: () => {
-          this.cargarCategorias();
-          this.limpiarFormulario();
+          this.successMessage = 'Categoría creada correctamente';
+          this.resetForm();
+          this.loadCategorias();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al crear categoría:', error);
+          this.errorMessage = 'Error al crear categoría.';
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.authService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     }
   }
 
-  editarCategoria(categoria: any) {
-    this.categoria = { ...categoria };
-  }
-
-  eliminarCategoria(id: number) {
-    if (confirm('¿Está seguro de eliminar esta categoría?')) {
-      this.apiService.eliminarCategoria(id).subscribe({
+  onDelete(id: number): void {
+    if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
+      this.isLoading = true;
+      this.errorMessage = null;
+      this.successMessage = null;
+      this.apiService.deleteCategoria(id).subscribe({
         next: () => {
-          this.cargarCategorias();
+          this.successMessage = 'Categoría eliminada correctamente';
+          this.loadCategorias();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al eliminar categoría:', error);
+          this.errorMessage = 'Error al eliminar categoría.';
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.authService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     }
   }
 
-  limpiarFormulario() {
-    this.categoria = {
-      id: null,
-      nombre: ''
-    };
+  resetForm(): void {
+    this.isEditMode = false;
+    this.selectedCategoryId = null;
+    this.categoria = { nombre: '' };
+    this.isLoading = false;
+    // Los mensajes de éxito/error se limpian al enviar o cargar.
   }
 } 

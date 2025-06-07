@@ -30,9 +30,12 @@ app.set("views", path.join(__dirname, "src/views"));
 app.use(layouts);
 app.set("layout", "layouts/layout");
 
-// Configuración de rutas API - Usamos el pool 'db' directamente en los modelos
+// Configuración de rutas API
 const mainRouter = require("./src/routes/main.router");
+const authRouter = require("./src/routes/index"); // Importar rutas de autenticación
+
 app.use('/api', mainRouter);
+app.use('/api', authRouter); // Agregar rutas de autenticación
 
 app.use("/api/categorias", require("./src/routes/categorias.router"));
 app.use("/api/productos", require("./src/routes/productos.router"));
