@@ -28,7 +28,7 @@ import { Subject, takeUntil } from 'rxjs';
             </li>
           </ul>
           <span class="navbar-text me-3 text-light fugaz-one-regular">
-            Rol: {{ userRole }}
+            {{ userRole }}
           </span>
           <button class="btn btn-danger fugaz-one-regular" (click)="logout()">
             <i class="bi bi-box-arrow-right"></i> Cerrar Sesión

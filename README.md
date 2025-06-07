@@ -16,6 +16,7 @@ Una aplicación CRUD (Crear, Leer, Actualizar, Eliminar) full-stack con backend 
 - Navegación con **barra superior (NavbarComponent)** y **pie de página (FooterComponent)** reutilizables.
 - **Sesión con timeout**: Cierra la sesión automáticamente después de un período de inactividad.
 - Estilización con fuente **"Permanent Marker"** en títulos clave (`Gestión de Productos`, `Gestión de Categorías`, `Gestión de Usuarios`).
+-   - **Funcionalidad de Búsqueda**: Permite buscar y filtrar registros en las tablas de Productos, Categorías y Usuarios.
 - Integración con base de datos **MySQL** para persistencia de datos.
 
 ## Requisitos Previos
@@ -116,43 +117,4 @@ Interactúa con estas rutas desde el frontend de Angular:
 
 - **Categorías:**
     - `GET /api/categorias`: Listar categorías (requiere token).
-    - `POST /api/categorias`: Crear nueva categoría (requiere token, `Administrador` o `Vendedor`).
-    - `GET /api/categorias/:id`: Obtener categoría por ID (requiere token).
-    - `PUT /api/categorias/:id`: Actualizar categoría por ID (requiere token, `Administrador` o `Vendedor`).
-    - `DELETE /api/categorias/:id`: Eliminar categoría por ID (requiere token, solo `Administrador`).
-
-- **Productos:**
-    - `GET /api/productos`: Listar productos (requiere token).
-    - `POST /api/productos`: Crear nuevo producto (requiere token, `Administrador` o `Vendedor`).
-    - `GET /api/productos/:id`: Obtener producto por ID (requiere token).
-    - `PUT /api/productos/:id`: Actualizar producto por ID (requiere token, `Administrador` o `Vendedor`).
-    - `DELETE /api/productos/:id`: Eliminar producto por ID (requiere token, solo `Administrador`).
-
-## Base de Datos
-
-La aplicación utiliza **MySQL** para almacenar información de usuarios, categorías y productos. La configuración de conexión se realiza a través del archivo `.env`. Las tablas utilizadas son:
-
-- **`users`**:
-    - `id` (INT, PK, AI)
-    - `username` (VARCHAR, UNIQUE)
-    - `password` (VARCHAR)
-    - `role` (VARCHAR, ej. 'Administrador', 'Vendedor', por defecto 'Vendedor')
-
-- **`categorias`**:
-    - `id` (INT, PK, AI)
-    - `nombre` (VARCHAR)
-
-- **`productos`**:
-    - `id` (INT, PK, AI)
-    - `nombre` (VARCHAR)
-    - `precio` (DECIMAL)
-    - `categoria_id` (INT, FK a `categorias`)
-
-## Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
-
-## Autor
-
-Felipe Loaiza Castaño
-- GitHub: [@thebug13](https://github.com/thebug13)
+    - `POST /api/categorias`: Crear nueva categoría (requiere token, `Administrador`

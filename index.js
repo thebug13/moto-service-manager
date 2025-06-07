@@ -39,7 +39,6 @@ app.use('/api', authRouter); // Agregar rutas de autenticación
 
 app.use("/api/categorias", require("./src/routes/categorias.router"));
 app.use("/api/productos", require("./src/routes/productos.router"));
-app.use("/api/contacto", require("./src/routes/contacto.router"));
 
 const PORT = process.env.PORT || 3001;
 
