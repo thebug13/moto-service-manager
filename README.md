@@ -64,8 +64,8 @@ JWT_SECRET=tu_secreto_jwt_seguro
 
 Este script creará la base de datos `crud_node` (si no existe) y las tablas `users`, `categorias` y `productos`, incluyendo un usuario `Administrador` por defecto.
 
-User: admin@gmail.com
-Password: admin123
+- User: admin@gmail.com
+- Password: admin123
 
 ## Estructura del Proyecto
 
