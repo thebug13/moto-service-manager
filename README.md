@@ -118,3 +118,8 @@ Interactúa con estas rutas desde el frontend de Angular:
 - **Categorías:**
     - `GET /api/categorias`: Listar categorías (requiere token).
     - `POST /api/categorias`: Crear nueva categoría (requiere token, `Administrador`
+
+## Autor
+
+[Felipe Loaiza Castaño](https://github.com/thebug13)
+- GitHub: [@thebug13](https://github.com/thebug13)

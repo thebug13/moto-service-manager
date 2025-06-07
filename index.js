@@ -1,3 +1,4 @@
+// Code developed by Felipe Loaiza - https://github.com/thebug13
 require("dotenv").config();
 
 const express = require("express");

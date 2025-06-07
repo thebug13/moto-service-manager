@@ -1,7 +1,8 @@
+// Code developed by Felipe Loaiza - https://github.com/thebug13
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode'; // Cambiado de import jwt_decode from 'jwt-decode';
 
 @Injectable({
