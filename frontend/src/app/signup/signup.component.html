@@ -6,6 +6,15 @@
           <h2 class="text-center mb-4">Registro</h2>
           
           <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+            <!-- Campo de Nombre del Auxiliar -->
+            <div class="form-group mb-3">
+              <label for="nombre_auxiliar" class="form-label text-white">Nombre del Auxiliar</label>
+              <input type="text" id="nombre_auxiliar" class="form-control" formControlName="nombre_auxiliar" required>
+              <div *ngIf="signupForm.get('nombre_auxiliar')?.invalid && (signupForm.get('nombre_auxiliar')?.dirty || signupForm.get('nombre_auxiliar')?.touched)" class="text-danger mt-1">
+                <div *ngIf="signupForm.get('nombre_auxiliar')?.errors?.['required']">El nombre es requerido.</div>
+              </div>
+            </div>
+
             <!-- Campo de Email -->
             <div class="form-group mb-3">
               <label for="email" class="form-label text-white">Correo Electrónico</label>
@@ -23,6 +32,20 @@
               <div *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.dirty || signupForm.get('password')?.touched)" class="text-danger mt-1">
                 <div *ngIf="signupForm.get('password')?.errors?.['required']">La contraseña es requerida.</div>
                 <div *ngIf="signupForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres.</div>
+              </div>
+            </div>
+
+            <!-- Campo de Rol -->
+            <div class="form-group mb-3">
+              <label for="role" class="form-label text-white">Rol</label>
+              <select id="role" class="form-control" formControlName="role" required>
+                <option value="">Seleccione un rol</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Jefe de taller">Jefe de taller</option>
+                <option value="Auxiliar">Auxiliar</option>
+              </select>
+              <div *ngIf="signupForm.get('role')?.invalid && (signupForm.get('role')?.dirty || signupForm.get('role')?.touched)" class="text-danger mt-1">
+                <div *ngIf="signupForm.get('role')?.errors?.['required']">El rol es requerido.</div>
               </div>
             </div>
             

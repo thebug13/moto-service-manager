@@ -1,0 +1,14 @@
+/* Estilos para gestión de motos */
+.card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.table th, .table td {
+  vertical-align: middle;
+}
+.btn {
+  min-width: 90px;
+}
+.spinner-border {
+  width: 2.5rem;
+  height: 2.5rem;
+} 

@@ -34,12 +34,17 @@ app.set("layout", "layouts/layout");
 // Configuración de rutas API
 const mainRouter = require("./src/routes/main.router");
 const authRouter = require("./src/routes/index"); // Importar rutas de autenticación
+const clienteRoutes = require('./src/routes/clienteRoutes');
+const motoRoutes = require('./src/routes/motoRoutes');
+const reparacionRoutes = require('./src/routes/reparacionRoutes');
+const repuestoRoutes = require('./src/routes/repuestoRoutes');
 
 app.use('/api', mainRouter);
 app.use('/api', authRouter); // Agregar rutas de autenticación
-
-app.use("/api/categorias", require("./src/routes/categorias.router"));
-app.use("/api/productos", require("./src/routes/productos.router"));
+app.use('/api/clientes', clienteRoutes);
+app.use('/api/motos', motoRoutes);
+app.use('/api/reparaciones', reparacionRoutes);
+app.use('/api/repuestos', repuestoRoutes);
 
 const PORT = process.env.PORT || 3001;
 

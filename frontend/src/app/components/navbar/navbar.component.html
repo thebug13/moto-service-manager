@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fugaz-one-regular" routerLink="/">Crud Node</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link fugaz-one-regular" routerLink="/clientes" routerLinkActive="active">Clientes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fugaz-one-regular" routerLink="/motos" routerLinkActive="active">Motos</a>
+        </li>
+        <li class="nav-item" *ngIf="userRole === 'Auxiliar'">
+          <a class="nav-link fugaz-one-regular" routerLink="/reparaciones-auxiliar" routerLinkActive="active">Reparaciones (Auxiliar)</a>
+        </li>
+        <li class="nav-item" *ngIf="userRole === 'Administrador'">
+          <a class="nav-link fugaz-one-regular" routerLink="/user-management" routerLinkActive="active">Gestión de Usuarios</a>
+        </li>
+        <li class="nav-item" *ngIf="isAdmin || userRole === 'Jefe de taller'">
+          <a class="nav-link fugaz-one-regular" routerLink="/payroll" routerLinkActive="active">Nómina</a>
+        </li>
+        <li class="nav-item" *ngIf="userRole === 'Jefe de taller' || userRole === 'Administrador'">
+          <a class="nav-link fugaz-one-regular" routerLink="/reparaciones-management" routerLinkActive="active">Reparaciones</a>
+        </li>
+      </ul>
+      <span class="navbar-text me-3 text-light fugaz-one-regular">
+        {{ userRole }}<span *ngIf="userNombreAuxiliar">: {{ userNombreAuxiliar }}</span>
+      </span>
+      <button class="btn btn-danger fugaz-one-regular" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+      </button>
+    </div>
+  </div>
+</nav> 

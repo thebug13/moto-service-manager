@@ -1,0 +1,16 @@
+/* Estilos para gestión de reparaciones del auxiliar */
+.card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.list-group-item.active {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+.btn {
+  min-width: 90px;
+}
+.spinner-border {
+  width: 2.5rem;
+  height: 2.5rem;
+} 

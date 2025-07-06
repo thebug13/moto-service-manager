@@ -34,21 +34,19 @@
                   <th>ID</th>
                   <th>Email</th>
                   <th>Rol</th>
+                  <th>Nombre</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let user of filteredUsers">
                   <td>{{ user.id }}</td>
                   <td>{{ user.email }}</td>
+                  <td>{{ user.role }}</td>
+                  <td>{{ user.nombre_auxiliar }}</td>
                   <td>
-                    <select 
-                      class="form-select text-dark" 
-                      [value]="user.role"
-                      (change)="updateUserRole(user.id, $event)"
-                      [disabled]="isLoading">
-                      <option value="Administrador">Administrador</option>
-                      <option value="Vendedor">Vendedor</option>
-                    </select>
+                    <button class="btn btn-sm btn-warning me-2" (click)="startEdit(user)">Editar</button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteUser(user)">Eliminar</button>
                   </td>
                 </tr>
               </tbody>
@@ -58,8 +56,41 @@
           <div *ngIf="!isLoading && filteredUsers.length === 0 && !error" class="alert alert-info mt-3" role="alert">
             No hay usuarios registrados en el sistema o no se encontraron resultados para su búsqueda.
           </div>
+
+          <!-- Formulario de crear/editar usuario -->
+          <div class="card mb-3" *ngIf="editMode">
+            <div class="card-body">
+              <h5 class="card-title">{{ userForm.id ? 'Editar Usuario' : 'Nuevo Usuario' }}</h5>
+              <form (ngSubmit)="saveUser()">
+                <div class="mb-3">
+                  <label for="nombre_auxiliar" class="form-label">Nombre</label>
+                  <input id="nombre_auxiliar" type="text" class="form-control" [(ngModel)]="userForm.nombre_auxiliar" name="nombre_auxiliar" required>
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Correo</label>
+                  <input id="email" type="email" class="form-control" [(ngModel)]="userForm.email" name="email" required>
+                </div>
+                <div class="mb-3" *ngIf="userForm.id">
+                  <label for="password" class="form-label">Nueva Contraseña (opcional)</label>
+                  <input id="password" type="password" class="form-control" [(ngModel)]="userForm.password" name="password">
+                </div>
+                <div class="mb-3">
+                  <label for="role" class="form-label">Rol</label>
+                  <select id="role" class="form-select" [(ngModel)]="userForm.role" name="role" required>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Jefe de taller">Jefe de taller</option>
+                    <option value="Auxiliar">Auxiliar</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-success me-2" [disabled]="isLoading">{{ userForm.id ? 'Actualizar' : 'Crear' }}</button>
+                <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
+              </form>
+            </div>
+          </div>
+          <!-- Botón para nuevo usuario -->
+          <button class="btn btn-primary mb-3" (click)="newUser()" *ngIf="!editMode">Nuevo Usuario</button>
         </div>
       </div>
     </div>
   </div>
-</div> 
+</div>

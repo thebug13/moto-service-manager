@@ -9,6 +9,8 @@ interface User {
   id: number;
   email: string;
   role: string;
+  nombre_auxiliar: string;
+  password?: string;
 }
 
 @Component({
@@ -25,6 +27,8 @@ export class UserManagementComponent implements OnInit {
   successMessage: string | null = null;
   searchText: string = '';
   filteredUsers: User[] = [];
+  userForm: Partial<User> = {};
+  editMode: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -104,5 +108,81 @@ export class UserManagementComponent implements OnInit {
       user.email.toLowerCase().includes(lowerCaseSearchText) ||
       user.role.toLowerCase().includes(lowerCaseSearchText)
     );
+  }
+
+  newUser(): void {
+    this.editMode = true;
+    this.userForm = { email: '', nombre_auxiliar: '', role: 'Auxiliar', password: '' };
+    this.successMessage = null;
+    this.error = null;
+  }
+
+  cancelEdit(): void {
+    this.editMode = false;
+    this.userForm = {};
+  }
+
+  saveUser(): void {
+    if (!this.userForm.email || !this.userForm.nombre_auxiliar || !this.userForm.role || (!this.userForm.id && !this.userForm.password)) {
+      this.error = 'Todos los campos son requeridos.';
+      return;
+    }
+    this.isLoading = true;
+    this.error = null;
+    this.successMessage = null;
+    if (this.editMode && this.userForm.id) {
+      // Editar usuario
+      this.apiService.updateUser(this.userForm.id, this.userForm).subscribe({
+        next: () => {
+          this.successMessage = 'Usuario actualizado correctamente';
+          this.loadUsers();
+          this.cancelEdit();
+          this.isLoading = false;
+        },
+        error: () => {
+          this.error = 'Error al actualizar el usuario.';
+          this.isLoading = false;
+        }
+      });
+    } else {
+      // Crear usuario
+      this.apiService.createUser(this.userForm).subscribe({
+        next: () => {
+          this.successMessage = 'Usuario creado correctamente';
+          this.loadUsers();
+          this.cancelEdit();
+          this.isLoading = false;
+        },
+        error: () => {
+          this.error = 'Error al crear el usuario.';
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  deleteUser(user: User): void {
+    if (!confirm('¿Seguro que deseas eliminar este usuario?')) return;
+    this.isLoading = true;
+    this.error = null;
+    this.successMessage = null;
+    this.apiService.deleteUser(user.id).subscribe({
+      next: () => {
+        this.successMessage = 'Usuario eliminado correctamente';
+        this.loadUsers();
+        this.isLoading = false;
+      },
+      error: () => {
+        this.error = 'Error al eliminar el usuario.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  startEdit(user: User): void {
+    this.editMode = true;
+    this.userForm = { ...user, password: '' };
+    this.successMessage = null;
+    this.error = null;
   }
 } 

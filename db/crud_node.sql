@@ -1,16 +1,7 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 08-06-2025 a las 01:07:54
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -24,128 +15,97 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `categorias`
---
-
-CREATE TABLE `categorias` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `categorias`
---
-
-INSERT INTO `categorias` (`id`, `nombre`) VALUES
-(1, 'Jugetes'),
-(2, 'Electronica'),
-(3, 'Hogar'),
-(4, 'Varios'),
-(5, 'Maquillaje');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `productos`
---
-
-CREATE TABLE `productos` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `precio` decimal(10,2) NOT NULL,
-  `categoria_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `productos`
---
-
-INSERT INTO `productos` (`id`, `nombre`, `precio`, `categoria_id`) VALUES
-(1, 'Barbies', 100000.00, 1),
-(2, 'Carro control Remoto', 130000.00, 1),
-(3, 'Computador', 1200000.00, 2),
-(4, 'Cucharas', 10000.00, 3),
-(5, 'Pantalla', 120000.00, 4),
-(6, 'Labial', 100000.00, 5);
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `users`
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` varchar(50) NOT NULL DEFAULT 'Vendedor'
+  `role` varchar(50) NOT NULL DEFAULT 'Auxiliar',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `users`
+-- Estructura de tabla para la tabla `clientes`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `role`) VALUES
-(3, 'vendedor@Gmail.com', '$2b$10$51OxGsUwe5VuLYtUBf7Bg.86kXyE66xBuHHALOdzsAEIg9BP7V8au', 'Vendedor'),
-(5, 'admin@gmail.com', '$2b$10$TkhOZGVETb6Tf6k0v12GZeR8Rz7QpDcgTRgBV/f8r94cxohEKIfVK', 'Administrador');
+CREATE TABLE `clientes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `fecha_registro` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Índices para tablas volcadas
+-- Estructura de tabla para la tabla `motos`
 --
 
---
--- Indices de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  ADD PRIMARY KEY (`id`);
+CREATE TABLE `motos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `placa` varchar(10) NOT NULL,
+  `marca` varchar(50) NOT NULL,
+  `modelo` varchar(50) NOT NULL,
+  `cliente_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `placa` (`placa`),
+  FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Indices de la tabla `productos`
---
-ALTER TABLE `productos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `categoria_id` (`categoria_id`);
-
---
--- Indices de la tabla `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
+-- Estructura de tabla para la tabla `reparaciones`
 --
 
---
--- AUTO_INCREMENT de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+CREATE TABLE `reparaciones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `moto_id` int(11) NOT NULL,
+  `auxiliar_id` int(11) NOT NULL,
+  `fecha_ingreso` datetime NOT NULL,
+  `diagnostico` text,
+  `estado` enum('ingresada','asignada','diagnosticada','reparada','facturada','entregada') NOT NULL DEFAULT 'ingresada',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`moto_id`) REFERENCES `motos` (`id`),
+  FOREIGN KEY (`auxiliar_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- AUTO_INCREMENT de la tabla `productos`
---
-ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT de la tabla `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- Restricciones para tablas volcadas
+-- Estructura de tabla para la tabla `repuestos`
 --
 
+CREATE TABLE `repuestos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reparacion_id` int(11) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`reparacion_id`) REFERENCES `reparaciones` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
--- Filtros para la tabla `productos`
+-- Estructura de tabla para la tabla `facturas`
 --
-ALTER TABLE `productos`
-  ADD CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`);
+
+CREATE TABLE `facturas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reparacion_id` int(11) NOT NULL,
+  `fecha` datetime NOT NULL,
+  `mano_obra` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `estado` enum('pendiente','pagada') NOT NULL DEFAULT 'pendiente',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`reparacion_id`) REFERENCES `reparaciones` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Datos de ejemplo
+--
+
+INSERT INTO `users` (`email`, `password`, `role`) VALUES
+('admin@taller.com', '$2b$10$TkhOZGVETb6Tf6k0v12GZeR8Rz7QpDcgTRgBV/f8r94cxohEKIfVK', 'Administrador'),
+('jefe@taller.com', '$2b$10$TkhOZGVETb6Tf6k0v12GZeR8Rz7QpDcgTRgBV/f8r94cxohEKIfVK', 'Jefe de taller'),
+('auxiliar@taller.com', '$2b$10$TkhOZGVETb6Tf6k0v12GZeR8Rz7QpDcgTRgBV/f8r94cxohEKIfVK', 'Auxiliar');
+
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

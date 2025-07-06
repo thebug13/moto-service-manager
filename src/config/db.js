@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const connection = mysql.createConnection({
   host: process.env.MYSQL_HOST || 'localhost', // Lee del .env, por defecto localhost
   user: process.env.MYSQL_USER || 'root',       // Lee del .env, por defecto root
-  password: process.env.MYSQL_PASSWORD || '', // Lee del .env, por defecto vacío
+  password: process.env.MYSQL_PASSWORD || '123456', // Lee del .env, por defecto vacío
   database: process.env.MYSQL_DATABASE || 'crud_node' // Lee del .env, por defecto crud_node
 });
 

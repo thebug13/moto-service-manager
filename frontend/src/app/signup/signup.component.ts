@@ -27,8 +27,10 @@ export class SignupComponent implements OnInit {
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
+      nombre_auxiliar: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      role: ['', [Validators.required]]
     });
   }
 
@@ -38,9 +40,9 @@ export class SignupComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const { email, password } = this.signupForm.value;
+    const { nombre_auxiliar, email, password, role } = this.signupForm.value;
 
-    this.authService.signup(email, password).subscribe({
+    this.authService.signup(email, password, role, nombre_auxiliar).subscribe({
       next: (response) => {
         this.message = response.message;
         this.isSuccess = true;

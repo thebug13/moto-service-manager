@@ -10,8 +10,8 @@ import { jwtDecode } from 'jwt-decode'; // Cambiado de import jwt_decode from 'j
 })
 export class AuthService {
   private baseUrl = 'http://localhost:3001'; // URL base del backend
-  private loginUrl = `${this.baseUrl}/api/login`;
-  private signupUrl = `${this.baseUrl}/api/signup`;
+  private loginUrl = `${this.baseUrl}/api/auth/login`;
+  private signupUrl = `${this.baseUrl}/api/auth/signup`;
   private tokenKey = 'authToken'; // Clave para almacenar el token en localStorage
 
   // BehaviorSubject para el estado de inicio de sesión
@@ -30,8 +30,8 @@ export class AuthService {
   }
 
   // Nueva función para registro
-  signup(email: string, password: string): Observable<any> {
-    return this.http.post<any>(this.signupUrl, { email, password });
+  signup(email: string, password: string, role: string, nombre_auxiliar: string): Observable<any> {
+    return this.http.post<any>(this.signupUrl, { email, password, role, nombre_auxiliar });
   }
 
   private saveToken(token: string): void {
@@ -96,6 +96,21 @@ export class AuthService {
     return null;
   }
 
+  // Nuevo método para obtener el nombre del auxiliar desde el token
+  getUserNombreAuxiliar(): string | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        return decodedToken.nombre_auxiliar || null;
+      } catch (error) {
+        console.error('Error decodificando el token para nombre_auxiliar:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
   // TODO: Implementar lógica de expiración de token si es necesario en el frontend
   // TODO: Decodificar token para obtener información del usuario si es necesario
-} 
+}

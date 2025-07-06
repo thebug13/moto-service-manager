@@ -1,0 +1,161 @@
+<div class="payroll-container">
+  <div class="header">
+    <h2>Calculadora de Nómina</h2>
+    <p>Calcule los salarios de los auxiliares basado en la mano de obra generada</p>
+  </div>
+
+  <div class="form-section">
+    <div class="form-group">
+      <label for="desde">Fecha Desde:</label>
+      <input type="date" id="desde" [(ngModel)]="desde" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="hasta">Fecha Hasta:</label>
+      <input type="date" id="hasta" [(ngModel)]="hasta" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="porcentaje">Porcentaje de Mano de Obra (%):</label>
+      <input type="number" id="porcentaje" [(ngModel)]="porcentaje" min="1" max="100" class="form-control">
+      <small class="form-text">Porcentaje que se pagará a cada auxiliar de su mano de obra generada</small>
+    </div>
+
+    <div class="button-group">
+      <button (click)="calcularNomina()" [disabled]="cargando" class="btn btn-primary">
+        <span *ngIf="cargando">Calculando...</span>
+        <span *ngIf="!cargando">Calcular Nómina</span>
+      </button>
+      <button (click)="limpiarResultados()" class="btn btn-secondary">Limpiar</button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="resultados.length > 0" class="results-section">
+    <div class="results-header">
+      <h3>Resultados de la Nómina</h3>
+    </div>
+
+    <div class="summary">
+      <p><strong>Período:</strong> {{ desde | date:'dd/MM/yyyy' }} - {{ hasta | date:'dd/MM/yyyy' }}</p>
+      <p><strong>Porcentaje aplicado:</strong> {{ porcentaje }}%</p>
+      <p><strong>Total de auxiliares:</strong> {{ resultados.length }}</p>
+    </div>
+
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Auxiliar</th>
+            <th>Total Mano de Obra</th>
+            <th>Porcentaje</th>
+            <th>Salario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of resultados">
+            <td>{{ item.nombre_auxiliar }}</td>
+            <td>${{ item.total_mano_obra | number:'1.2-2' }}</td>
+            <td>{{ porcentaje }}%</td>
+            <td class="salary">${{ item.salario | number:'1.2-2' }}</td>
+            <td>
+              <button (click)="verDetallesAuxiliar(item)" class="btn btn-info btn-sm">
+                Ver Detalles
+              </button>
+              <button (click)="generarDesprendibleIndividual(item)" class="btn btn-success btn-sm ms-1" [disabled]="cargandoDesprendible[item.auxiliar_id]">
+                <span *ngIf="cargandoDesprendible[item.auxiliar_id]">Generando...</span>
+                <span *ngIf="!cargandoDesprendible[item.auxiliar_id]">Descargar PDF</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td><strong>Total</strong></td>
+            <td><strong>${{ getTotalManoObra() | number:'1.2-2' }}</strong></td>
+            <td></td>
+            <td><strong>${{ getTotalSalarios() | number:'1.2-2' }}</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de Detalles -->
+  <div *ngIf="auxiliarSeleccionado" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Detalles de Trabajos - {{ auxiliarSeleccionado.nombre_auxiliar }}</h3>
+        <button (click)="cerrarDetalles()" class="btn-close">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="detalles-summary">
+          <p><strong>Período:</strong> {{ desde | date:'dd/MM/yyyy' }} - {{ hasta | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Total de reparaciones:</strong> {{ detallesAuxiliar.length }}</p>
+          <p><strong>Total mano de obra:</strong> ${{ getTotalDetalles() | number:'1.2-2' }}</p>
+        </div>
+
+        <div *ngIf="cargandoDetalles" class="loading">
+          <p>Cargando detalles...</p>
+        </div>
+
+        <div *ngIf="!cargandoDetalles && detallesAuxiliar.length > 0" class="detalles-table">
+          <div class="table-actions">
+            <button (click)="exportarDetallesPDF()" class="btn btn-primary btn-sm ms-2">
+              Exportar Detalles PDF
+            </button>
+          </div>
+          
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Placa</th>
+                <th>Marca/Modelo</th>
+                <th>Cliente</th>
+                <th>Diagnóstico</th>
+                <th>Estado</th>
+                <th>Mano de Obra</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let detalle of detallesAuxiliar">
+                <td>{{ detalle.fecha_ingreso | date:'dd/MM/yyyy' }}</td>
+                <td>{{ detalle.placa }}</td>
+                <td>{{ detalle.marca }} {{ detalle.modelo }}</td>
+                <td>{{ detalle.cliente_nombre }}</td>
+                <td class="diagnostico">{{ detalle.diagnostico || 'Sin diagnóstico' }}</td>
+                <td>
+                  <span class="estado-badge estado-{{ detalle.estado }}">
+                    {{ detalle.estado }}
+                  </span>
+                </td>
+                <td class="salary">${{ detalle.mano_obra | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="6"><strong>Total</strong></td>
+                <td><strong>${{ getTotalDetalles() | number:'1.2-2' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div *ngIf="!cargandoDetalles && detallesAuxiliar.length === 0" class="empty-details">
+          <p>No se encontraron reparaciones para este auxiliar en el período seleccionado.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!cargando && resultados.length === 0 && !error" class="empty-state">
+    <p>Seleccione las fechas y el porcentaje, luego haga clic en "Calcular Nómina" para ver los resultados.</p>
+  </div>
+</div> 

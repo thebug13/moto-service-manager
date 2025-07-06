@@ -13,8 +13,10 @@ const login = async (req, res) => {
         // 1. Buscar el usuario por email
         const user = await User.findUserByEmail(email);
 
-        // Verificar si el usuario existe
-        if (!user) {
+        // Verificar si el usuario existe y tiene una contraseña
+        if (!user || !user.password) {
+            // Log para depuración. No exponer si el usuario existe o no.
+            console.error(`Intento de login para el email: ${email}. El usuario no fue encontrado o no tiene una contraseña en la BD.`);
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
 
@@ -30,17 +32,14 @@ const login = async (req, res) => {
         const payload = {
             id: user.id,
             email: user.email,
-            role: user.role
+            role: user.role,
+            nombre_auxiliar: user.nombre_auxiliar
         };
 
-        jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-            if (err) {
-                console.error('Error al generar JWT:', err);
-                return res.status(500).json({ message: 'Error al generar token' });
-            }
-            console.log('Token JWT generado:', token);
-            res.json({ token });
-        });
+        // Usar la versión síncrona de jwt.sign dentro de un bloque async
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+        console.log('Token JWT generado:', token);
+        res.json({ token });
     } catch (err) {
         console.error('Error en el login:', err);
         res.status(500).json({ message: 'Error del servidor' });
@@ -49,13 +48,18 @@ const login = async (req, res) => {
 
 // Función para registrar un nuevo usuario
 const signup = async (req, res) => {
-    const { email, password, role } = req.body; // Asegurarse de que el rol se reciba desde req.body
+    const { email, password, role, nombre_auxiliar } = req.body; // Asegurarse de que el nombre_auxiliar se reciba desde req.body
+
+    // Validar que se recibieron los datos necesarios
+    if (!email || !password || !nombre_auxiliar) {
+        return res.status(400).json({ message: 'El email, la contraseña y el nombre son obligatorios.' });
+    }
 
     try {
-        const user = await User.createUser(email, password, role);
+        const user = await User.createUser(email, password, role, nombre_auxiliar);
 
         // Generar un token JWT para el nuevo usuario
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nombre_auxiliar: user.nombre_auxiliar }, process.env.JWT_SECRET, { expiresIn: '1h' });
         console.log("Generated Token:", token);
 
         res.status(201).json({ message: 'Usuario registrado exitosamente', token });

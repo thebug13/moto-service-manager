@@ -21,9 +21,9 @@ export class LoginComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    // Si el usuario ya está logueado, redirigir a productos
+    // Si el usuario ya está logueado, redirigir a clientes
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/productos']);
+      this.router.navigate(['/clientes']);
     }
   }
 
@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
         console.log('Login exitoso', response);
         this.isLoading = false;
         // Redirigir al usuario a la página principal después del login exitoso
-        window.location.href = '/productos';
+        window.location.href = '/clientes';
       },
       error: (error) => {
         console.error('Error en el login', error);

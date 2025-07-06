@@ -1,0 +1,98 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="mb-0">Gestión de Motos</h2>
+        </div>
+        <div class="card-body">
+          <!-- Campo de búsqueda -->
+          <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Buscar moto por placa, marca, modelo o cliente..." [(ngModel)]="searchText" (input)="filterMotos()">
+          </div>
+
+          <!-- Mensajes de error y éxito -->
+          <div *ngIf="error" class="alert alert-danger">
+            {{ error }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+
+          <!-- Estado de carga -->
+          <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+
+          <!-- Formulario de crear/editar moto -->
+          <div class="card mb-3" *ngIf="showForm">
+            <div class="card-body">
+              <h5 class="card-title">{{ editMode ? 'Editar Moto' : 'Nueva Moto' }}</h5>
+              <form (ngSubmit)="saveMoto()">
+                <div class="mb-3">
+                  <label for="placa" class="form-label">Placa</label>
+                  <input id="placa" type="text" class="form-control" [(ngModel)]="motoForm.placa" name="placa" required>
+                </div>
+                <div class="mb-3">
+                  <label for="marca" class="form-label">Marca</label>
+                  <input id="marca" type="text" class="form-control" [(ngModel)]="motoForm.marca" name="marca" required>
+                </div>
+                <div class="mb-3">
+                  <label for="modelo" class="form-label">Modelo</label>
+                  <input id="modelo" type="text" class="form-control" [(ngModel)]="motoForm.modelo" name="modelo" required>
+                </div>
+                <div class="mb-3">
+                  <label for="cliente_id" class="form-label">Cliente</label>
+                  <select id="cliente_id" class="form-select" [(ngModel)]="motoForm.cliente_id" name="cliente_id" required>
+                    <option value="" disabled selected>Seleccione un cliente</option>
+                    <option *ngFor="let cliente of clientes" [value]="cliente.id">{{ cliente.nombre }} ({{ cliente.telefono }})</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-success me-2" [disabled]="isLoading">{{ editMode ? 'Actualizar' : 'Crear' }}</button>
+                <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Botón para nueva moto -->
+          <button class="btn btn-primary mb-3" (click)="newMoto()" *ngIf="!showForm">Nueva Moto</button>
+
+          <!-- Tabla de motos -->
+          <div *ngIf="!isLoading && filteredMotos.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Placa</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Cliente</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let moto of filteredMotos">
+                  <td>{{ moto.id }}</td>
+                  <td>{{ moto.placa }}</td>
+                  <td>{{ moto.marca }}</td>
+                  <td>{{ moto.modelo }}</td>
+                  <td>{{ moto.cliente_nombre }} ({{ moto.cliente_telefono }})</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning me-2" (click)="startEdit(moto)">Editar</button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteMoto(moto)">Eliminar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!isLoading && filteredMotos.length === 0 && !error" class="alert alert-info mt-3" role="alert">
+            No hay motos registradas o no se encontraron resultados para su búsqueda.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,97 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="mb-0">Gestión de Clientes</h2>
+        </div>
+        <div class="card-body">
+          <!-- Campo de búsqueda -->
+          <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Buscar cliente por nombre o teléfono..." [(ngModel)]="searchText" (input)="filterClientes()">
+          </div>
+
+          <!-- Mensajes de error y éxito -->
+          <div *ngIf="error" class="alert alert-danger">
+            {{ error }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+
+          <!-- Estado de carga -->
+          <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+
+          <!-- Formulario de crear/editar cliente -->
+          <div class="card mb-3" *ngIf="editMode">
+            <div class="card-body">
+              <h5 class="card-title">{{ clienteForm.id ? 'Editar Cliente' : 'Nuevo Cliente' }}</h5>
+              <form (ngSubmit)="saveCliente()">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label">Nombre</label>
+                  <input id="nombre" type="text" class="form-control" [(ngModel)]="clienteForm.nombre" name="nombre" required (input)="toUpperCaseNombre()">
+                </div>
+                <div class="mb-3">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input id="telefono" type="text" class="form-control" [(ngModel)]="clienteForm.telefono" name="telefono" required (input)="toUpperCaseTelefono()">
+                </div>
+                <div class="mb-3" *ngIf="!clienteForm.id">
+                  <label for="placa" class="form-label">Placa</label>
+                  <input id="placa" type="text" class="form-control" [(ngModel)]="clienteForm.placa" name="placa" required (input)="formatPlaca()">
+                </div>
+                <div class="mb-3" *ngIf="!clienteForm.id">
+                  <label for="marca" class="form-label">Marca</label>
+                  <input id="marca" type="text" class="form-control" [(ngModel)]="clienteForm.marca" name="marca" required (input)="toUpperCaseMarca()">
+                </div>
+                <div class="mb-3" *ngIf="!clienteForm.id">
+                  <label for="modelo" class="form-label">Modelo</label>
+                  <input id="modelo" type="text" class="form-control" [(ngModel)]="clienteForm.modelo" name="modelo" required (input)="toUpperCaseModelo()">
+                </div>
+                <button type="submit" class="btn btn-success me-2" [disabled]="isLoading">{{ clienteForm.id ? 'Actualizar' : 'Crear' }}</button>
+                <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Botón para nuevo cliente -->
+          <button class="btn btn-primary mb-3" (click)="newCliente()" *ngIf="!editMode">Nuevo Cliente</button>
+
+          <!-- Tabla de clientes -->
+          <div *ngIf="!isLoading && filteredClientes.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
+                  <th>Fecha de Registro</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cliente of filteredClientes">
+                  <td>{{ cliente.id }}</td>
+                  <td>{{ cliente.nombre }}</td>
+                  <td>{{ cliente.telefono }}</td>
+                  <td>{{ cliente.fecha_registro | date:'yyyy-MM-dd HH:mm' }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning me-2" (click)="startEdit(cliente)">Editar</button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteCliente(cliente)">Eliminar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!isLoading && filteredClientes.length === 0 && !error" class="alert alert-info mt-3" role="alert">
+            No hay clientes registrados o no se encontraron resultados para su búsqueda.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,129 +1,146 @@
-# Aplicación CRUD Full-Stack
+# Sistema de Gestión de Taller Mecánico
 
-Una aplicación CRUD (Crear, Leer, Actualizar, Eliminar) full-stack con backend en **Node.js/Express** y frontend en **Angular 19**. Utiliza **MySQL** para la gestión de productos, categorías y usuarios, e incluye un sistema de autenticación robusto con roles.
+Este sistema permite gestionar las operaciones diarias de un taller mecánico de motocicletas, incluyendo el registro de clientes, motos, reparaciones, repuestos y facturación.
 
-## Características
+## Características Principales
 
-- **Backend robusto** con Node.js y Express, sirviendo una API RESTful.
-- **Frontend moderno** con Angular 19 para una interfaz de usuario dinámica y responsiva.
-- **Autenticación de usuarios** con JWT (JSON Web Tokens).
-- **Control de acceso basado en roles**: `Administrador` y `Vendedor`.
-    - `Administrador` tiene acceso total (Crear, Leer, Actualizar, Eliminar) en todas las entidades.
-    - `Vendedor` puede Crear, Leer y Actualizar productos y categorías, pero no puede eliminar.
-- Gestión completa de **productos** (CRUD).
-- Gestión completa de **categorías** (CRUD).
-- **Gestión de usuarios** (CRUD para `Administradores`).
-- Navegación con **barra superior (NavbarComponent)** y **pie de página (FooterComponent)** reutilizables.
-- **Sesión con timeout**: Cierra la sesión automáticamente después de un período de inactividad.
-- Estilización con fuente **"Permanent Marker"** en títulos clave (`Gestión de Productos`, `Gestión de Categorías`, `Gestión de Usuarios`).
--   - **Funcionalidad de Búsqueda**: Permite buscar y filtrar registros en las tablas de Productos, Categorías y Usuarios.
-- Integración con base de datos **MySQL** para persistencia de datos.
+### 📋 Módulo de Clientes y Motos
+- Registro y gestión de clientes
+- Registro y seguimiento de motocicletas
+- Vinculación de motos con sus propietarios
 
-## Requisitos Previos
+### 🧑‍🔧 Módulo de Recepción y Asignación
+- Registro de ingreso de motocicletas
+- Asignación de trabajos a auxiliares
 
-- Node.js (v14 o superior)
-- npm (Node Package Manager)
-- Angular CLI (Instalar globalmente: `npm install -g @angular/cli`)
-- Servidor MySQL en ejecución
+### 🧰 Módulo de Diagnóstico y Repuestos
+- Registro de diagnósticos
+- Gestión de repuestos necesarios
+- Cálculo de costos de reparación
+
+### 🧾 Módulo de Facturación
+- Generación de facturas
+- Cálculo automático de costos
+- Seguimiento de pagos
+
+### 📁 Módulo de Historial
+- Historial de reparaciones por moto/cliente
+- Reportes de trabajo por auxiliar
+
+## Roles del Sistema
+
+- **Administrador**: Acceso total al sistema
+- **Jefe de taller**: Supervisión de operaciones
+- **Auxiliar**: Gestión de diagnósticos y reparaciones asignadas
+
+## Requisitos Técnicos
+
+- Node.js
+- MySQL
+- npm o yarn
 
 ## Instalación
 
 1. Clonar el repositorio:
 ```bash
 git clone [url-del-repositorio]
-cd crud-node
+cd taller-mecanico
 ```
 
-2. Instalar dependencias del **backend**:
+2. Instalar dependencias:
 ```bash
 npm install
 ```
 
-3. Instalar dependencias del **frontend**:
-```bash
-cd frontend
-npm install
-cd ..
-```
-
-4. Crear un archivo `.env` en el directorio raíz (`crud-node/`) copiando el contenido de `.env-example` y actualizándolo con tu configuración. Ejemplo:
+3. Configurar variables de entorno:
+Crear archivo `.env` con:
 ```env
-PORT=3001
-
-MYSQL_HOST=localhost
-MYSQL_USER=tu_usuario_mysql
-MYSQL_PASSWORD=tu_password_mysql
-MYSQL_DATABASE=crud_node
-JWT_SECRET=tu_secreto_jwt_seguro
+PORT=3000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=tu_contraseña
+DB_DATABASE=crud_node
+JWT_SECRET=tu_secreto_jwt
 ```
 
-## Inicializacion de la Base de datos
-
-5. La base de datos esta en la carpeta /db importa el archivo en PhpMyAdmin
-
-
-Este script creará la base de datos `crud_node` (si no existe) y las tablas `users`, `categorias` y `productos`, incluyendo un usuario `Administrador` por defecto.
-
-- User: admin@gmail.com
-- Password: admin123
-
-## Estructura del Proyecto
-
-```
-crud-node/
-├── src/             # Código del Backend
-│   ├── controllers/   # Lógica de negocio (authController.js, productos.controller.js, etc.)
-│   ├── models/        # Modelos de datos e interacción con DB (user.js, product.js, category.js, init-db.js)
-│   ├── middleware/    # Middleware de autenticación y autorización (authMiddleware.js)
-│   └── routes/        # Manejadores de rutas API (index.js)
-├── frontend/        # Código del Frontend de Angular
-│   ├── src/           # Archivos fuente de Angular
-│   │   ├── app/         # Componentes, servicios, módulos de Angular
-│   │   │   ├── components/  # Componentes reutilizables (navbar, footer, layout)
-│   │   │   ├── services/    # Servicios (auth.service.ts, api.service.ts)
-│   │   │   ├── guards/      # Guardias de ruta (auth.guard.ts)
-│   │   │   └── ...
-│   │   ├── assets/      # Archivos estáticos
-│   │   ├── environments/ # Variables de entorno
-│   │   ├── index.html   # HTML principal
-│   │   └── styles.scss  # Estilos globales
-│   └── ...
-├── index.js         # Punto de entrada del Backend
-├── package.json     # Dependencias del Backend
-└── .env             # Variables de entorno
+4. Configurar la base de datos:
+```bash
+npm run setup-db
 ```
 
-## Scripts Disponibles
-
-- Para iniciar el **backend**:
+5. Iniciar el servidor:
 ```bash
 npm run dev
 ```
-El Backend se inicia en: `http://localhost:3001`
 
-- Para iniciar el **frontend** (en una terminal separada):
-```bash
-cd frontend
-ng serve
-```
-El Frontend se inicia en: `http://localhost:4200`
+## Estructura de la API
 
-## Rutas API (Backend)
+### Autenticación
+- POST `/api/auth/login` - Iniciar sesión
+- POST `/api/auth/signup` - Registrar usuario
 
-Interactúa con estas rutas desde el frontend de Angular:
+### Clientes
+- GET `/api/clientes` - Listar clientes
+- POST `/api/clientes` - Crear cliente
+- GET `/api/clientes/:id` - Obtener cliente
+- PUT `/api/clientes/:id` - Actualizar cliente
+- DELETE `/api/clientes/:id` - Eliminar cliente
 
-- **Autenticación y Usuarios:**
-    - `POST /api/auth/signup`: Registro de nuevos usuarios.
-    - `POST /api/auth/login`: Inicio de sesión de usuarios.
-    - `GET /api/users`: Listar usuarios (requiere token, solo `Administrador`).
-    - `PUT /api/users/:id`: Actualizar usuario (requiere token, solo `Administrador`).
-    - `DELETE /api/users/:id`: Eliminar usuario (requiere token, solo `Administrador`).
+### Motos
+- GET `/api/motos` - Listar motos
+- POST `/api/motos` - Registrar moto
+- GET `/api/motos/id/:id` - Obtener moto por ID
+- GET `/api/motos/placa/:placa` - Buscar moto por placa
+- PUT `/api/motos/:id` - Actualizar moto
+- DELETE `/api/motos/:id` - Eliminar moto
 
-- **Categorías:**
-    - `GET /api/categorias`: Listar categorías (requiere token).
-    - `POST /api/categorias`: Crear nueva categoría (requiere token, `Administrador`
+### Reparaciones
+- POST `/api/reparaciones` - Crear reparación
+- GET `/api/reparaciones` - Listar reparaciones
+- GET `/api/reparaciones/id/:id` - Obtener reparación
+- PUT `/api/reparaciones/:id/diagnostico` - Registrar diagnóstico
+- PUT `/api/reparaciones/:id/estado` - Actualizar estado
 
-## Autor
+### Repuestos
+- POST `/api/repuestos/reparacion/:reparacion_id` - Agregar repuesto
+- GET `/api/repuestos/reparacion/:reparacion_id` - Listar repuestos
+- PUT `/api/repuestos/:id` - Actualizar repuesto
+- DELETE `/api/repuestos/:id` - Eliminar repuesto
 
-[Felipe Loaiza Castaño](https://github.com/thebug13)
-- GitHub: [@thebug13](https://github.com/thebug13)
+### Facturas
+- POST `/api/facturas/reparacion/:reparacion_id` - Generar factura
+- GET `/api/facturas` - Listar facturas
+- GET `/api/facturas/:id` - Obtener factura
+- PUT `/api/facturas/:id/pagar` - Marcar como pagada
+
+## Seguridad
+
+- Autenticación mediante JWT
+- Control de acceso basado en roles
+- Validación de datos en todas las operaciones
+- Protección contra inyección SQL
+
+## Contribución
+
+Si deseas contribuir al proyecto:
+1. Crea un fork
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
+
+## Autor y Créditos
+
+Desarrollado por Felipe Loaiza Castaño y colaboradores.
+
+## Contacto y Soporte
+
+¿Tienes dudas, sugerencias o encontraste un bug? Puedes abrir un issue en este repositorio o contactar al autor principal a través de [tu-email@ejemplo.com].
+
+---
+
+¡Gracias por usar y contribuir a este sistema de gestión para talleres de motos! Si te fue útil, no dudes en darle una estrella ⭐ al repositorio.

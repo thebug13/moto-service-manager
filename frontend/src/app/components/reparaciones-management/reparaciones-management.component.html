@@ -1,0 +1,96 @@
+<!-- Tabla de reparaciones -->
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="table-responsive-custom">
+        <table class="table table-bordered table-hover align-middle" *ngIf="filteredReparaciones.length > 0">
+          <thead style="background: none;">
+            <tr>
+              <th>Placa</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Cliente</th>
+              <th>Auxiliar</th>
+              <th>Fecha Ingreso</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reparacion of filteredReparaciones">
+              <td>{{ reparacion.placa }}</td>
+              <td>{{ reparacion.marca }}</td>
+              <td>{{ reparacion.modelo }}</td>
+              <td>{{ reparacion.cliente_nombre }}</td>
+              <td>{{ reparacion.nombre_auxiliar }}</td>
+              <td>{{ reparacion.fecha_ingreso | date:'dd/MM/yyyy' }}</td>
+              <td>{{ reparacion.estado }}</td>
+              <td>
+                <button *ngIf="isJefeTaller" (click)="verDetalles(reparacion)" class="btn btn-info btn-sm me-2 acciones-btn">
+                  Ver Detalles
+                </button>
+                <button *ngIf="isJefeTaller" (click)="descargarFacturaPDF(reparacion)" class="btn btn-primary btn-sm acciones-btn" title="Descargar Factura PDF">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.6a.5.5 0 0 1 1 0v2.6A2 2 0 0 1 14 15H2a2 2 0 0 1-2-2v-2.6a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 10.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 9.293V1.5a.5.5 0 0 0-1 0v7.793L5.354 7.146a.5.5 0 1 0-.708.708l3 3z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalles de Reparación -->
+<div class="modal fade show" tabindex="-1" [ngStyle]="{ display: mostrarModalDetalle ? 'block' : 'none', background: 'rgba(0,0,0,0.5)' }" *ngIf="mostrarModalDetalle">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalles de Reparación</h5>
+        <button type="button" class="btn-close" (click)="cerrarModalDetalle()"></button>
+      </div>
+      <div class="modal-body" *ngIf="detalleReparacion">
+        <div class="mb-2"><strong>Cliente:</strong> {{ detalleReparacion.cliente_nombre }}</div>
+        <div class="mb-2"><strong>Moto:</strong> {{ detalleReparacion.placa }} - {{ detalleReparacion.marca }} - {{ detalleReparacion.modelo }}</div>
+        <div class="mb-2"><strong>Auxiliar:</strong> {{ detalleReparacion.nombre_auxiliar }}</div>
+        <div class="mb-2"><strong>Fecha de Ingreso:</strong> {{ detalleReparacion.fecha_ingreso | date:'dd/MM/yyyy' }}</div>
+        <div class="mb-2"><strong>Estado:</strong> {{ detalleReparacion.estado }}</div>
+        <div class="mb-2"><strong>Diagnóstico:</strong> {{ detalleReparacion.diagnostico || 'N/A' }}</div>
+        <div class="mb-2"><strong>Mano de Obra:</strong> ${{ detalleReparacion.mano_obra | number:'1.2-2' }}</div>
+        <hr>
+        <h6>Repuestos Utilizados</h6>
+        <table class="table table-bordered table-sm" *ngIf="detalleRepuestos.length > 0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Cantidad</th>
+              <th>Precio Unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let rep of detalleRepuestos">
+              <td>{{ rep.nombre }}</td>
+              <td>{{ rep.cantidad }}</td>
+              <td>${{ rep.precio | number:'1.2-2' }}</td>
+              <td>${{ (rep.precio * rep.cantidad) | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="detalleRepuestos.length === 0" class="text-muted">No se registraron repuestos para esta reparación.</div>
+        <hr>
+        <div *ngIf="detalleTotales">
+          <div><strong>Total repuestos:</strong> ${{ detalleTotales.totalRepuestos | number:'1.2-2' }}</div>
+          <div><strong>Mano de obra:</strong> ${{ detalleTotales.manoObra | number:'1.2-2' }}</div>
+          <div class="fs-5 mt-2"><strong>TOTAL A PAGAR:</strong> ${{ detalleTotales.total | number:'1.2-2' }}</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModalDetalle()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div> 
