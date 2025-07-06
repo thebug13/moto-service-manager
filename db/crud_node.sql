@@ -20,7 +20,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
+  `email` varchar(191) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` varchar(50) NOT NULL DEFAULT 'Auxiliar',
   PRIMARY KEY (`id`),
@@ -32,12 +32,23 @@ CREATE TABLE `users` (
 --
 
 CREATE TABLE `clientes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `telefono` varchar(20) NOT NULL,
-  `fecha_registro` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `fecha_registro` DATETIME NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DELIMITER $$
+CREATE TRIGGER before_insert_clientes
+BEFORE INSERT ON clientes
+FOR EACH ROW
+BEGIN
+  IF NEW.fecha_registro IS NULL THEN
+    SET NEW.fecha_registro = NOW();
+  END IF;
+END$$
+DELIMITER ;
 
 --
 -- Estructura de tabla para la tabla `motos`

@@ -4,8 +4,8 @@
   "description": "Crud en Node.js",
   "main": "src/server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "setup-db": "mysql -u root < db/crud_node.sql"
   },
   "author": "felipe loaiza",
